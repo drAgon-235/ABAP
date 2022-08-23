@@ -1,0 +1,32 @@
+CLASS zcl_slawos_gleiter DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+  INTERFACES zif_gol_objects.
+methods constructor importing x type int4
+                              y type int4.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+   data mv_x type int4.
+   data mv_y type int4.
+ENDCLASS.
+
+
+CLASS ZCL_SLAWOS_GLEITER IMPLEMENTATION.
+
+  METHOD zif_gol_objects~place_on_board.
+*       DATA lo_gleiter TYPE REF TO zcl_slawos_board.
+        io_made_board->set_alive( x = mv_x + 1 y = mv_y + 3 ).
+        io_made_board->set_alive( x = mv_x + 2 y = mv_y + 3 ).
+        io_made_board->set_alive( x = mv_x + 3 y = mv_y + 3 ).
+        io_made_board->set_alive( x = mv_x + 3 y = mv_y + 2 ).
+        io_made_board->set_alive( x = mv_x + 2 y = mv_y + 1 ).
+  ENDMETHOD.
+
+  METHOD constructor.
+    mv_x = x.
+    mv_y = y.
+  ENDMETHOD.
+ENDCLASS.

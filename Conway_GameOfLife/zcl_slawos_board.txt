@@ -1,0 +1,135 @@
+CLASS zcl_slawos_board DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+
+     INTERFACES zif_slawos_board.
+
+     TYPES : BEGIN OF ts_slawos_board,
+                y_coordinate TYPE int4,
+                x_coordinate TYPE int4,
+                alive        TYPE zif_slawos_board=>our_char,
+             END OF ts_slawos_board.
+     TYPES tt_slawos_board TYPE HASHED
+             TABLE OF ts_slawos_board
+            WITH UNIQUE KEY y_coordinate x_coordinate.
+     DATA lt_slawos_board TYPE tt_slawos_board.
+
+     DATA mv_y_size TYPE int4.
+     DATA mv_x_size TYPE int4.
+
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+CLASS ZCL_SLAWOS_BOARD IMPLEMENTATION.
+
+  METHOD zif_slawos_board~check_life.
+    data ls_slawos_board like line of lt_slawos_board.
+        READ TABLE lt_slawos_board INTO ls_slawos_board
+           WITH KEY y_coordinate = y
+                 x_coordinate = x.
+    life_sign = ls_slawos_board-alive.
+  ENDMETHOD.
+
+  METHOD zif_slawos_board~intialization.
+    data ls_slawos_board like line of lt_slawos_board.
+    mv_x_size = x.
+    mv_y_size = y.
+
+    DO mv_y_size TIMES.
+       ls_slawos_board-y_coordinate = sy-index.
+
+        DO mv_x_size TIMES.
+            ls_slawos_board-x_coordinate = sy-index.
+            INSERT ls_slawos_board INTO TABLE lt_slawos_board.
+        ENDDO.
+    ENDDO.
+  ENDMETHOD.
+
+  METHOD zif_slawos_board~set_alive.
+    READ TABLE lt_slawos_board ASSIGNING FIELD-SYMBOL(<ls_slawos_board>)
+     WITH KEY y_coordinate = y
+              x_coordinate = x.
+
+    CHECK <ls_slawos_board> IS ASSIGNED.
+
+    <ls_slawos_board>-alive = abap_true.
+  ENDMETHOD.
+
+  METHOD zif_slawos_board~kill.
+    READ TABLE lt_slawos_board ASSIGNING FIELD-SYMBOL(<ls_slawos_board>)
+     WITH KEY y_coordinate = y
+              x_coordinate = x.
+
+    CHECK <ls_slawos_board> IS ASSIGNED.
+
+    <ls_slawos_board>-alive = abap_false.
+  ENDMETHOD.
+
+  METHOD zif_slawos_board~print_game.
+    DATA lv_zeile TYPE string.
+    io_out->write( |Board mit den Dimensionen { mv_x_size }x{ mv_y_size }| ).
+    DO mv_y_size TIMES.
+    DATA(lv_y) = sy-index.
+        DO mv_x_size TIMES.
+        DATA(lv_x) = sy-index.
+            IF zif_slawos_board~check_life( x = lv_x  y = lv_y ) = abap_true.
+            lv_zeile = lv_zeile && 'X'.
+            ELSE.
+            lv_zeile = lv_zeile && '-'.
+            ENDIF.
+        ENDDO.
+        io_out->write( lv_zeile ).
+        clear lv_zeile.
+    ENDDO.
+  ENDMETHOD.
+
+
+  METHOD zif_slawos_board~count_living_neighbours.
+        data lv_count TYPE int4.
+
+        IF zif_slawos_board~check_life( y = y - 1   x = x - 1 ) = abap_true.
+        lv_count = lv_count + 1.
+        ENDIF.
+        IF zif_slawos_board~check_life( y = y - 1   x = x  ) = abap_true.
+        lv_count = lv_count + 1.
+        ENDIF.
+        IF zif_slawos_board~check_life( y = y - 1   x = x + 1  ) = abap_true.
+        lv_count = lv_count + 1.
+        ENDIF.
+
+        IF zif_slawos_board~check_life( y = y    x = x - 1 ) = abap_true.
+        lv_count = lv_count + 1.
+        ENDIF.
+*        IF zif_slawos_board~check_life( y = y    x = x  ) = abap_true.
+*        lv_count = lv_count + 1.
+*        ENDIF.
+        IF zif_slawos_board~check_life( y = y    x = x + 1  ) = abap_true.
+        lv_count = lv_count + 1.
+        ENDIF.
+
+        IF zif_slawos_board~check_life( y = y + 1    x = x - 1 ) = abap_true.
+        lv_count = lv_count + 1.
+        ENDIF.
+        IF zif_slawos_board~check_life( y = y + 1   x = x  ) = abap_true.
+        lv_count = lv_count + 1.
+        ENDIF.
+        IF zif_slawos_board~check_life( y = y + 1   x = x + 1  ) = abap_true.
+        lv_count = lv_count + 1.
+        ENDIF.
+
+   rv_counter = lv_count.
+  ENDMETHOD.
+
+  METHOD zif_slawos_board~get_x_size.
+    rv_value = mv_x_size.
+  ENDMETHOD.
+
+  METHOD zif_slawos_board~get_y_size.
+    rv_value = mv_y_size.
+  ENDMETHOD.
+ENDCLASS.

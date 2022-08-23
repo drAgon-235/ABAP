@@ -1,0 +1,40 @@
+CLASS ztest_bubble DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+  INTERFACES zif_sort.
+      INTERFACES if_oo_adt_classrun.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+CLASS ZTEST_BUBBLE IMPLEMENTATION.
+
+  METHOD if_oo_adt_classrun~main.
+    DATA gv_t0 TYPE TIMESTAMPL.
+    DATA gv_t1 TYPE TIMESTAMPL.
+    DATA gv_delta TYPE TIMESTAMPL.
+
+    DATA lo_sort TYPE REF TO zif_sort.              "Referenz für das Objekt
+    create OBJECT lo_sort TYPE zcl_buble_sort.      "Das tatsächliche Objekt
+
+    DATA lt_to_sort TYPE zif_sort=>tt_to_sort.
+    DATA lt_sorted TYPE zif_sort=>tt_to_sort.
+
+    SELECT ABAPObjectType  from  I_CUSTABAPOBJDIRECTORYENTRY into table @lt_to_sort up to 30 rows.
+
+    out->write( lt_to_sort ).
+    out->write( |--------------------------------------------| ).
+
+    GET TIME STAMP FIELD gv_t0.
+    lt_sorted = lo_sort->execute( lt_to_sort ).
+    GET TIME STAMP FIELD gv_t1.
+    gv_delta = gv_t1 - gv_t0.
+
+    out->write( lt_sorted ).
+    out->write( gv_delta ).
+  ENDMETHOD.
+ENDCLASS.

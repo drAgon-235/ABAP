@@ -1,0 +1,54 @@
+CLASS zcl_gnome_sort DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+      INTERFACES zif_sort.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+CLASS zcl_gnome_sort IMPLEMENTATION.
+  METHOD zif_sort~execute.
+    FIELD-SYMBOLS <lv_1> TYPE string.   "Special kind of variable for single parts of a column
+    FIELD-SYMBOLS <lv_2> TYPE string.   "basically providing just a pointer being assigned by 'ASSIGN [ table(index) ] TO' <lv_FieldSymbol> - NOT by a '='  !!!!
+    DATA lv_tmp TYPE string.            "temporary storage for a String variable (needed in line 36)
+    DATA lv_length TYPE int4.           "
+    DATA lv_index TYPE int4 value 1.    "
+*    DATA lv_flag TYPE int4 value 1.    " real flag
+
+    lv_length = lines( it_data ).       " calculating the length of 'it_data' - the input parameter
+
+    rt_data =  it_data.              " (output parameter) is first a copy of the input
+
+
+
+    IF lv_length > 1.
+        WHILE lv_index < lv_length.
+
+            ASSIGN rt_data[ lv_index ] TO     <lv_1>.
+            ASSIGN rt_data[ lv_index + 1 ] TO <lv_2>.
+
+           IF <lv_1> <= <lv_2>.
+                lv_index = lv_index + 1.
+
+           ELSEIF <lv_1> > <lv_2>.
+                lv_tmp = <lv_1>.   "Swap
+                <lv_1> = <lv_2>.
+                <lv_2> = lv_tmp.
+
+               IF lv_index = 1.
+                    lv_index = lv_index + 1.
+
+               ELSEIF lv_index < lv_length and lv_index <> 1.
+                    lv_index = lv_index - 1.
+               ENDIF.
+            ENDIF.
+         ENDWHILE.
+      ENDIF.
+
+
+  ENDMETHOD.
+
+ENDCLASS.

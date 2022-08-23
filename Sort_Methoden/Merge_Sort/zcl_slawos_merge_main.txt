@@ -1,0 +1,62 @@
+CLASS zcl_slawos_merge_main DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+    INTERFACES if_oo_adt_classrun.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+CLASS zcl_slawos_merge_main IMPLEMENTATION.
+
+  METHOD if_oo_adt_classrun~main.
+
+    DATA mv_t0 TYPE utclong.
+    DATA mv_t1 TYPE utclong.
+    DATA mv_delta TYPE decfloat34.
+    DATA lv_rows TYPE int8.
+
+    DATA lo_sort TYPE REF TO zif_sort.                      "Referenz für das Objekt
+*    create OBJECT lo_sort TYPE zcl_slawos_merge_sort.      "Das tatsächliche Objekt
+    CREATE OBJECT lo_sort TYPE zcl_buble_sort.              "Das tatsächliche Objekt
+
+
+    DATA lt_to_sort TYPE zif_sort=>tt_to_sort.
+    DATA lt_sorted TYPE zif_sort=>tt_to_sort.
+
+*    out->write( lt_to_sort ).
+    DO 4 TIMES.
+      lv_rows  = '2' ** sy-index.
+*    lv_rows = 100.
+      SELECT ABAPObjectType  FROM  i_custabapobjdirectoryentry INTO TABLE @lt_to_sort UP TO @lv_rows ROWS.
+
+      out->write( |{ lv_rows } Rows-----------------------------------| ).
+      DO 2 TIMES.
+        CASE sy-index.
+          WHEN 1 .
+            out->write(  'Bubble Sort'  ).
+            CREATE OBJECT lo_sort TYPE zcl_buble_sort.           "Das tatsächliche Objekt
+
+          WHEN 2 .
+            out->write(  'Merge Sort'  ).
+            CREATE OBJECT lo_sort TYPE zcl_slawos_merge_sort.    "Das tatsächliche Objekt
+        ENDCASE.
+
+        mv_t0 = utclong_current( ).
+        lt_sorted = lo_sort->execute( lt_to_sort ).
+        mv_t1 = utclong_current( ).
+        mv_delta = utclong_diff( high = mv_t1 low = mv_t0 ).
+
+*  out->write( lt_sorted ).
+        DATA(lv_test) = utclong_diff( high = mv_t1 low = mv_t0 ).
+        out->write( mv_delta ).
+        out->write( 'END_TEST' ).
+
+      ENDDO."2 times - Version
+    ENDDO."7 times - Length...
+
+  ENDMETHOD.
+ENDCLASS.

@@ -1,0 +1,45 @@
+CLASS zcl_bubble_sort DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+    INTERFACES zif_sort.
+ENDCLASS.
+
+
+CLASS ZCL_BUBBLE_SORT IMPLEMENTATION.
+
+  METHOD zif_sort~execute.
+
+    FIELD-SYMBOLS <lv_1> TYPE string.   "Special kind of variable for single parts of a column
+    FIELD-SYMBOLS <lv_2> TYPE string.   "basically providing just a pointer being assigned by 'ASSIGN [ table(index) ] TO' <lv_FieldSymbol> - NOT by a '='  !!!!
+    DATA lv_tmp TYPE string.            "temporary storage for a String variable (needed in line 36)
+    DATA lv_length TYPE int4.           "
+    DATA lv_count TYPE int4 value 1.    "flag
+
+    lv_length = lines( it_data ).       " calculating the length of 'it_data' - the input parameter
+
+    rt_data =  it_data.              " (output parameter) is first a copy of the input
+
+    WHILE lv_count <> 0.
+        lv_count = 0.           "some kind o'flag
+
+        DO  lv_length - 1 TIMES.
+        ASSIGN rt_data[ sy-index ] TO     <lv_1>.
+        ASSIGN rt_data[ sy-index + 1 ] TO <lv_2>.
+
+          IF <lv_1> > <lv_2>.
+
+             lv_tmp = <lv_1>.   " ||| CORE
+             <lv_1> = <lv_2>.   " <<< of the
+             <lv_2> = lv_tmp.   " ||| Bubble-Sort-Logic (BSL)
+
+             lv_count = lv_count + 1. "changing flag (by entering the IF clause) means continuing the WHILE loop
+          ENDIF.
+        ENDDO.
+    ENDWHILE.
+
+
+  ENDMETHOD.
+ENDCLASS.

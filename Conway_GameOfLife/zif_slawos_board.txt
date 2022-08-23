@@ -1,0 +1,30 @@
+INTERFACE zif_slawos_board
+  PUBLIC .
+    TYPES our_char TYPE c LENGTH 1.
+
+    METHODS check_life IMPORTING x TYPE int4
+                                     y TYPE int4
+                                     RETURNING VALUE(life_sign) TYPE our_char.
+
+    METHODS intialization IMPORTING x TYPE int4
+                                    y TYPE int4.
+
+
+    METHODS set_alive IMPORTING x TYPE int4
+                                y TYPE int4.
+
+    METHODS kill IMPORTING x TYPE int4
+                           y TYPE int4.
+
+    METHODS get_x_size RETURNING VALUE(rv_value) type int4.
+    METHODS get_y_size RETURNING VALUE(rv_value) type int4.
+
+   METHODS print_game IMPORTING io_out TYPE REF TO if_oo_adt_classrun_out.
+
+   METHODS count_living_neighbours IMPORTING x TYPE int4
+                                             y TYPE int4
+                                             RETURNING VALUE(rv_counter) TYPE int4.
+
+
+
+ENDINTERFACE.

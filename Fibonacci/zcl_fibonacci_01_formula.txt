@@ -1,0 +1,41 @@
+CLASS zcl_fibonacci_01_formula DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+    INTERFACES zif_fibonacci.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+
+CLASS zcl_fibonacci_01_formula IMPLEMENTATION.
+
+    METHOD zif_fibonacci~execute_fibo.
+
+        DATA mv_next_nr TYPE int4.      "the current field to be filled
+        DATA mv_length TYPE int4.       " Input-parameter (it_data)
+
+        mv_length = it_data.            " variable length of the fibonacci - (sequence+2(0,1))
+
+        DATA lt_to_fill TYPE zif_fibonacci~tt_to_fill.  "internal table
+        DATA wa_filling TYPE int4.                      " 'workarea'
+        wa_filling = 0.
+        APPEND wa_filling TO lt_to_fill.                "first fixnr. is defined
+        wa_filling = 1.
+        APPEND wa_filling TO lt_to_fill.                "second fixnr. is defined
+
+        DO mv_length TIMES.
+        mv_next_nr = lt_to_fill[ sy-index ] + lt_to_fill[ sy-index + 1 ].
+        wa_filling = mv_next_nr.
+        APPEND wa_filling TO lt_to_fill.
+        ENDDO.
+
+        rt_data = lt_to_fill.
+
+
+
+    ENDMETHOD.
+ENDCLASS.

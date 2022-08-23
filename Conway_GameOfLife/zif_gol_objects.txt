@@ -1,0 +1,8 @@
+INTERFACE zif_gol_objects
+  PUBLIC .
+
+    METHODS place_on_board IMPORTING "x TYPE int4
+                                     "y TYPE int4
+                                     io_made_board TYPE REF TO zif_slawos_board.
+
+ENDINTERFACE.

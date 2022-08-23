@@ -1,0 +1,10 @@
+INTERFACE zif_sort
+  PUBLIC .
+
+   TYPES tt_to_sort TYPE standard TABLE OF STRING WITH DEFAULT KEY .
+*   TYPES tt_to_sort TYPE sorted TABLE OF ts_to_sort WITH non-unique KEY line.
+
+  METHODS execute IMPORTING it_data TYPE tt_to_sort
+                    RETURNING VALUE(rt_data) type tt_to_sort.
+
+ENDINTERFACE.

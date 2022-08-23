@@ -1,0 +1,53 @@
+CLASS zcl_slawos_fantasy DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+  INTERFACES zif_gol_objects.
+    methods constructor importing x type int4
+                              y type int4.
+  PROTECTED SECTION.
+    data mv_x TYPE int4.
+    data mv_y TYPE int4.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+CLASS ZCL_SLAWOS_FANTASY IMPLEMENTATION.
+
+  METHOD constructor.
+    mv_x = x.
+    mv_y = y.
+  ENDMETHOD.
+
+  METHOD zif_gol_objects~place_on_board.
+     io_made_board->set_alive( x = mv_x + 2 y = mv_y + 1 ).
+     io_made_board->set_alive( x = mv_x + 4 y = mv_y + 1 ).
+
+     io_made_board->set_alive( x = mv_x + 1 y = mv_y + 2 ).
+     io_made_board->set_alive( x = mv_x + 2 y = mv_y + 2 ).
+     io_made_board->set_alive( x = mv_x + 3 y = mv_y + 2 ).
+     io_made_board->set_alive( x = mv_x + 4 y = mv_y + 2 ).
+     io_made_board->set_alive( x = mv_x + 5 y = mv_y + 2 ).
+
+     io_made_board->set_alive( x = mv_x + 3 y = mv_y + 3 ).
+*     io_made_board->set_alive( x = mv_x + 5 y = mv_y + 2 ).
+*
+*     io_made_board->set_alive( x = mv_x + 1 y = mv_y + 3 ).
+**     io_made_board->set_alive( x = mv_x + 3 y = mv_y + 3 ).
+*     io_made_board->set_alive( x = mv_x + 5 y = mv_y + 3 ).
+*
+*     io_made_board->set_alive( x = mv_x + 1 y = mv_y + 4 ).
+*     io_made_board->set_alive( x = mv_x + 2 y = mv_y + 4 ).
+*     io_made_board->set_alive( x = mv_x + 4 y = mv_y + 4 ).
+*     io_made_board->set_alive( x = mv_x + 5 y = mv_y + 4 ).
+*
+*     io_made_board->set_alive( x = mv_x + 1 y = mv_y + 5 ).
+*     io_made_board->set_alive( x = mv_x + 2 y = mv_y + 5 ).
+*     io_made_board->set_alive( x = mv_x + 3 y = mv_y + 5 ).
+*     io_made_board->set_alive( x = mv_x + 4 y = mv_y + 5 ).
+*     io_made_board->set_alive( x = mv_x + 5 y = mv_y + 5 ).
+
+  ENDMETHOD.
+ENDCLASS.

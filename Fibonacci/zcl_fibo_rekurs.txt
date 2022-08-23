@@ -1,0 +1,85 @@
+CLASS zcl_fibo_rekurs DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+    INTERFACES zif_fibonacci_rekursiv.
+
+      DATA  io_out TYPE REF TO if_oo_adt_classrun_out.
+      DATA mv_counter TYPE int4.
+
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+
+* Here the turbo-extension (buffer) starts:
+   TYPES : BEGIN OF ts_puffer_table,
+                number TYPE int4,
+                fibo TYPE int4,
+            END OF ts_puffer_table.
+
+    TYPES tt_puffer_table TYPE HASHED TABLE OF ts_puffer_table WITH UNIQUE KEY number.
+
+    DATA lt_buffer TYPE tt_puffer_table.
+
+    METHODS get_value IMPORTING iv_number TYPE int4
+                        RETURNING VALUE(rv_fibo_number) TYPE int4.
+
+    METHODS buffer_value IMPORTING iv_number TYPE int4
+                                   iv_fibo_number TYPE int4.
+
+ENDCLASS.
+
+
+CLASS zcl_fibo_rekurs IMPLEMENTATION.
+
+    METHOD zif_fibonacci_rekursiv~fibonniere.
+
+    "the PURE Fibonacci (slow)
+*        mv_counter = mv_counter + 1.
+*        IF iv_cnt = 1 OR iv_cnt = 2.
+*        rv_fibo = 1.
+*           ELSEIF iv_cnt > 2.
+*           rv_fibo = zif_fibonacci_rekursiv~fibonniere( iv_cnt - 1 ) + zif_fibonacci_rekursiv~fibonniere( iv_cnt - 2 ).
+*        ENDIF.
+
+*-----------------------------------------------------------------------------------------------------------------------
+
+    "the Turbo Fibonacci: with buffer
+        "A: E = get_value(I) => fertig, sonst weiter mit B:
+        rv_fibo = get_value( iv_cnt ).
+
+         IF rv_fibo = 0.
+        "B: E = fibonniere(I) (ohne Puffer!!!):
+             mv_counter = mv_counter + 1.       "HIER werden die Durchläufe gezählt
+
+             IF iv_cnt = 1 OR iv_cnt = 2.
+                rv_fibo = 1.
+                ELSEIF iv_cnt > 2.
+                  rv_fibo = zif_fibonacci_rekursiv~fibonniere( iv_cnt - 1 ) + zif_fibonacci_rekursiv~fibonniere( iv_cnt - 2 ).
+             ENDIF.
+         "C: Puffern von (I,E):
+             buffer_value( iv_number = iv_cnt  iv_fibo_number = rv_fibo ).
+         ENDIF.
+    ENDMETHOD.
+
+
+     METHOD zif_fibonacci_rekursiv~get_counter.
+        rv_counter = mv_counter.
+     ENDMETHOD.
+
+
+  METHOD get_value.
+    DATA ls_int_tab TYPE ts_puffer_table.
+    READ TABLE lt_buffer INTO ls_int_tab WITH TABLE KEY number = iv_number.
+    rv_fibo_number = ls_int_tab-fibo.
+  ENDMETHOD.
+
+
+  METHOD buffer_value.
+    DATA ls_int_tab TYPE ts_puffer_table.
+    ls_int_tab-number = iv_number.
+    ls_int_tab-fibo = iv_fibo_number.
+    INSERT ls_int_tab INTO TABLE lt_buffer .
+  ENDMETHOD.
+ENDCLASS.

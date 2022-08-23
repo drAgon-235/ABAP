@@ -1,0 +1,145 @@
+CLASS zcl_jbr_board DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+
+     INTERFACES zif_slawos_board.
+
+     TYPES : BEGIN OF ts_board,
+                y TYPE int4,
+                x TYPE int4,
+             END OF ts_board.
+
+     TYPES tt_board TYPE sorted TABLE OF ts_board with unique key x y.
+
+     DATA mt_board TYPE tt_board.
+
+     DATA mv_y_size TYPE int4.
+     DATA mv_x_size TYPE int4.
+
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+CLASS ZCL_JBR_BOARD IMPLEMENTATION.
+
+  METHOD zif_slawos_board~check_life.
+
+    READ TABLE mt_board TRANSPORTING no fields
+        WITH KEY y = y
+                 x = x.
+    if sy-subrc = 0.
+      life_sign = abap_true.
+    endif.
+
+
+  ENDMETHOD.
+
+
+  METHOD zif_slawos_board~intialization.
+    data ls_board like line of mt_board.
+    mv_x_size = x.
+    mv_y_size = y.
+
+  ENDMETHOD.
+
+
+  METHOD zif_slawos_board~set_alive.
+
+    READ TABLE mt_board transporting no fields
+     WITH KEY y = y
+              x = x.
+
+    if sy-subrc ne 0.
+
+      data ls_board like line of mt_board.
+      ls_board = value #( x = x
+                          y = y
+                           ).
+       insert ls_board into table mt_board.
+      endif.
+
+  ENDMETHOD.
+
+
+  METHOD zif_slawos_board~kill.
+
+    delete mt_board where x = x and y = y.
+
+  ENDMETHOD.
+
+
+  METHOD zif_slawos_board~print_game.
+    DATA lv_zeile TYPE string.
+    io_out->write( |Board mit den Dimensionen { mv_x_size }x{ mv_y_size }| ).
+    DO mv_y_size TIMES.
+    DATA(lv_y) = sy-index.
+
+        DO mv_x_size TIMES.
+        DATA(lv_x) = sy-index.
+
+            IF zif_slawos_board~check_life( x = lv_x  y = lv_y ) = abap_true.
+            lv_zeile = lv_zeile && 'X'.
+            ELSE.
+            lv_zeile = lv_zeile && '-'.
+            ENDIF.
+
+        ENDDO.
+        io_out->write( lv_zeile ).
+        clear lv_zeile.
+
+    ENDDO.
+
+  ENDMETHOD.
+
+
+  METHOD zif_slawos_board~count_living_neighbours.
+        data lv_count TYPE int4.
+
+
+        IF zif_slawos_board~check_life( y = y - 1   x = x - 1 ) = abap_true.
+        lv_count = lv_count + 1.
+        ENDIF.
+        IF zif_slawos_board~check_life( y = y - 1   x = x  ) = abap_true.
+        lv_count = lv_count + 1.
+        ENDIF.
+        IF zif_slawos_board~check_life( y = y - 1   x = x + 1  ) = abap_true.
+        lv_count = lv_count + 1.
+        ENDIF.
+
+        IF zif_slawos_board~check_life( y = y    x = x - 1 ) = abap_true.
+        lv_count = lv_count + 1.
+        ENDIF.
+*        IF zif_slawos_board~check_life( y = y    x = x  ) = abap_true.
+*        lv_count = lv_count + 1.
+*        ENDIF.
+        IF zif_slawos_board~check_life( y = y    x = x + 1  ) = abap_true.
+        lv_count = lv_count + 1.
+        ENDIF.
+
+        IF zif_slawos_board~check_life( y = y + 1    x = x - 1 ) = abap_true.
+        lv_count = lv_count + 1.
+        ENDIF.
+        IF zif_slawos_board~check_life( y = y + 1   x = x  ) = abap_true.
+        lv_count = lv_count + 1.
+        ENDIF.
+        IF zif_slawos_board~check_life( y = y + 1   x = x + 1  ) = abap_true.
+        lv_count = lv_count + 1.
+        ENDIF.
+
+   rv_counter = lv_count.
+  ENDMETHOD.
+
+
+  METHOD zif_slawos_board~get_x_size.
+    rv_value = mv_x_size.
+  ENDMETHOD.
+
+
+  METHOD zif_slawos_board~get_y_size.
+    rv_value = mv_y_size.
+  ENDMETHOD.
+ENDCLASS.

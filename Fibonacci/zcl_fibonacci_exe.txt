@@ -1,0 +1,43 @@
+CLASS zcl_fibonacci_exe DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC.
+  PUBLIC SECTION.
+        INTERFACES if_oo_adt_classrun.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+CLASS zcl_fibonacci_exe IMPLEMENTATION.
+
+  METHOD if_oo_adt_classrun~main.
+
+    DATA mv_fibo_nr TYPE int4.
+    DATA mv_t0 TYPE utclong.
+    DATA mv_t1 TYPE utclong.
+    DATA mv_delta TYPE decfloat34.
+
+    DATA lo_fibo_runner TYPE REF TO zif_fibonacci_rekursiv.
+    CREATE OBJECT lo_fibo_runner TYPE  zcl_fibo_rekurs.
+    DATA lv_fertig TYPE int4.
+
+                                           mv_fibo_nr = 46. "generating your Fibo-Number
+mv_t0 = utclong_current( ).
+   lv_fertig = lo_fibo_runner->fibonniere( mv_fibo_nr ).
+mv_t1 = utclong_current( ).
+mv_delta = utclong_diff( high = mv_t1  low = mv_t0 ).
+
+    out->write( |Die { mv_fibo_nr }. Fibonacci-Zahl lautet: { lv_fertig } | ).
+    out->write( |Berechnungsdauer:  { mv_delta } Sekunden| ).
+
+ lv_fertig = lo_fibo_runner->get_counter( ).                            "RECYCLING von lt_fertig  ;-)
+    out->write( |Anzahl der (rekursiven) Methodenaufrufe:  { lv_fertig } | ).        " lv_fertig = die Fibonacci-Zahl * 2 (ca.)
+
+
+  ENDMETHOD.
+ENDCLASS.
+
+
+*   DATA lo_fibo_runner TYPE REF TO zif_fibonacci.
+*   DATA lt_fertig TYPE zif_fibonacci=>tt_to_fill.
+*   CREATE OBJECT lo_fibo_runner TYPE zcl_fibonacci_01_formula.

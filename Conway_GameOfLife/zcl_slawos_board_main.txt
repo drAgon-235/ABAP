@@ -1,0 +1,191 @@
+CLASS zcl_slawos_board_main DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC.
+
+  PUBLIC SECTION.
+
+            INTERFACES zif_gol_objects.
+           INTERFACES if_oo_adt_classrun.
+            METHODS osziliere IMPORTING "iv_cnt TYPE int4
+                                        io_out TYPE REF TO if_oo_adt_classrun_out
+                                        io_board type ref to zif_slawos_board
+                              returning value(ro_board) type ref to zif_slawos_board.
+
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+CLASS ZCL_SLAWOS_BOARD_MAIN IMPLEMENTATION.
+
+  METHOD if_oo_adt_classrun~main.
+    DATA lo_board TYPE REF TO zif_slawos_board.
+    CREATE OBJECT lo_board TYPE zcl_slawos_board.
+ 
+    lo_board->intialization( x = 100 y = 100 ).
+
+    DATA lo_object TYPE REF TO zif_gol_objects.     "Objektreferenz wird kreiert
+
+*    CREATE OBJECT lo_object TYPE zcl_slawos_gleiter exporting x = 5 y = 5.     "Objekt 'itself' wird konkret kreiert
+*    lo_object->place_on_board( io_made_board = lo_board ).
+
+
+*    CREATE OBJECT lo_object TYPE zcl_slawos_gleiter exporting x = 15 y = 1.
+*    lo_object->place_on_board( io_made_board = lo_board ).
+
+*    CREATE OBJECT lo_object TYPE zcl_slawos_kreuz exporting x = 1 y = 1.
+*    lo_object->place_on_board( io_made_board = lo_board ).
+
+    CREATE OBJECT lo_object TYPE zcl_slawos_grosskreuz exporting x = 21 y = 11.
+    lo_object->place_on_board( io_made_board = lo_board ).
+
+*    CREATE OBJECT lo_object TYPE zcl_slawos_thumbnail exporting x = 3 y = 1.
+*    lo_object->place_on_board( io_made_board = lo_board ).
+
+*    CREATE OBJECT lo_object TYPE zcl_slawos_malplus exporting x = 5 y = 3.
+*    lo_object->place_on_board( io_made_board = lo_board ).
+
+*    CREATE OBJECT lo_object TYPE zcl_slawos_pfeil exporting x = 21 y = 11.
+*    lo_object->place_on_board( io_made_board = lo_board ).
+
+*    CREATE OBJECT lo_object TYPE zcl_slawos_fantasy exporting x = 21 y = 11.
+*    lo_object->place_on_board( io_made_board = lo_board ).
+
+
+     DATA lv_t0 TYPE TIMESTAMPL.
+      DATA lv_t1 TYPE TIMESTAMPL.
+       DATA lv_result TYPE TIMESTAMPL.
+
+    GET TIME STAMP FIELD lv_t0.
+
+    lo_board->print_game( io_out = out ).
+
+    lo_board = osziliere( "iv_cnt = 10
+                          io_out = out
+                          io_board = lo_board ).
+    lo_board = osziliere( "iv_cnt = 10
+                          io_out = out
+                          io_board = lo_board ).
+    lo_board = osziliere( "iv_cnt = 10
+                          io_out = out
+                          io_board = lo_board ).
+    lo_board = osziliere( "iv_cnt = 10
+                          io_out = out
+                          io_board = lo_board ).
+    lo_board = osziliere( "iv_cnt = 10
+                          io_out = out
+                          io_board = lo_board ).
+    lo_board = osziliere( "iv_cnt = 10
+                          io_out = out
+                          io_board = lo_board ).
+    lo_board = osziliere( "iv_cnt = 10
+                          io_out = out
+                          io_board = lo_board ).
+    lo_board = osziliere( "iv_cnt = 10
+                          io_out = out
+                          io_board = lo_board ).
+    lo_board = osziliere( "iv_cnt = 10
+                          io_out = out
+                          io_board = lo_board ).
+    lo_board = osziliere( "iv_cnt = 10
+                          io_out = out
+                          io_board = lo_board ).
+    lo_board = osziliere( "iv_cnt = 10
+                          io_out = out
+                          io_board = lo_board ).
+    lo_board = osziliere( "iv_cnt = 10
+                          io_out = out
+                          io_board = lo_board ).
+    lo_board = osziliere( "iv_cnt = 10
+                          io_out = out
+                          io_board = lo_board ).
+    lo_board = osziliere( "iv_cnt = 10
+                          io_out = out
+                          io_board = lo_board ).
+    lo_board = osziliere( "iv_cnt = 10
+                          io_out = out
+                          io_board = lo_board ).
+
+    lo_board = osziliere( "iv_cnt =  10
+                          io_out = out
+                          io_board = lo_board ).
+    lo_board = osziliere( "iv_cnt = 10
+                          io_out = out
+                          io_board = lo_board ).
+    lo_board = osziliere( "iv_cnt = 10
+                          io_out = out
+                          io_board = lo_board ).
+    lo_board = osziliere( "iv_cnt = 10
+                          io_out = out
+                          io_board = lo_board ).
+
+    lo_board = osziliere( "iv _cnt = 10
+                          io_out = out
+                          io_board = lo_board ).
+    lo_board = osziliere( "iv_cnt = 10
+                          io_out = out
+                          io_board = lo_board ).
+    lo_board = osziliere( "iv_cnt = 10
+                          io_out = out
+                          io_board = lo_board ).
+    lo_board = osziliere( "iv_cnt = 10
+                          io_out = out
+                          io_board = lo_board ).
+
+
+
+  GET TIME STAMP FIELD lv_t1.
+
+  lv_result = lv_t1 - lv_t0.
+  out->write( lv_result ).
+
+  ENDMETHOD.
+
+
+  METHOD osziliere.
+
+    CREATE object ro_board type zcl_slawos_board.
+    ro_board->intialization( x = io_board->get_x_size( )
+                             y = io_board->get_y_size( )  ).
+
+*DO iv_cnt TIMES.
+
+     DO io_board->get_y_size( ) TIMES.
+        DATA(lv_y) = sy-index.
+
+        DO io_board->get_x_size(  ) TIMES.
+            DATA(lv_x) = sy-index.
+
+
+           CASE io_board->check_life( y = lv_y  x = lv_x ).
+               WHEN abap_true.
+                  IF io_board->count_living_neighbours( y = lv_y  x = lv_x ) < 2
+                  OR io_board->count_living_neighbours( y = lv_y  x = lv_x ) > 3.
+                               ro_board->kill( y = lv_y  x = lv_x ).
+                      ELSE.
+                           ro_board->set_alive( y = lv_y  x = lv_x ).
+                  ENDIF.
+
+               WHEN abap_false.
+                  IF io_board->count_living_neighbours( y = lv_y  x = lv_x ) = 3.
+                           ro_board->set_alive( y = lv_y  x = lv_x ).
+                      ELSE.
+                            ro_board->kill( y = lv_y  x = lv_x ).
+                  ENDIF.
+           ENDCASE.
+        ENDDO.
+    ENDDO.
+*   io_board = ro_board.
+
+*    ENDDO.
+
+
+*    ro_board->print_game( io_out ).
+*    io_out->write( | Das war Runde: { sy-index } | ).
+
+*    io_board = ro_board.  "ro_board muss neues lo_board werden
+
+*    ENDDO.
+  ENDMETHOD.
+ENDCLASS.

@@ -1,0 +1,139 @@
+CLASS zcl_slawos_merge_sort DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+    INTERFACES zif_sort.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+    METHODS split IMPORTING it_data  TYPE  zif_sort=>tt_to_sort
+                  EXPORTING et_data1 TYPE zif_sort=>tt_to_sort
+                            et_data2 TYPE zif_sort=>tt_to_sort.
+
+    METHODS merge IMPORTING it_data1         TYPE zif_sort=>tt_to_sort
+                            it_data2         TYPE zif_sort=>tt_to_sort
+                  RETURNING VALUE(rt_result) TYPE zif_sort=>tt_to_sort.
+ENDCLASS.
+
+
+CLASS ZCL_SLAWOS_MERGE_SORT IMPLEMENTATION.
+
+  METHOD zif_sort~execute.
+    DATA lt_1 LIKE it_data.
+    DATA lt_2 LIKE it_data.
+    DATA lv_length_IT TYPE i.
+    DATA out TYPE REF TO if_oo_adt_classrun_out.
+    lv_length_IT = lines( it_data ).
+
+    IF lv_length_IT <= 1.
+
+      rt_data = it_data.
+
+    ELSE.
+      split(
+        EXPORTING
+          it_data  = it_data
+        IMPORTING
+          et_data1 = lt_1
+          et_data2 = lt_2 ).
+
+**       Sortiere it1 und it2  ????             Hier wird nicht sortiert, sondern erst mal nur halbiert bis zum Geht-Nicht-Mehr
+    lt_1 = zif_sort~execute( lt_1 ).    "Die Rekursion bewirkt die Atomisierung der zu sortierenden Felder durch Spaltung.... !!!!
+    lt_2 = zif_sort~execute( lt_2 ).    "und zwar solange, bis immer nur ein Element übrig bleibt (s. Zeile 29)
+                        "aber wohin wandert das Element danach? zu nächsten Schleife, bis es =1 ist!!! sollte man es nicht irgendwo zwischenspeichern?
+
+**    verschmelze it1 und it2 sortiert.
+    rt_data = merge( it_data1 = lt_1            "welches lt_1 ??? es gibt potenitiell unzählige Paare von  " lt_1+lt_2 "s
+                     it_data2 = lt_2 ).
+
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD merge.
+
+    DATA lv_p1 TYPE i VALUE 1.
+    DATA lv_p2 TYPE i VALUE 1.
+    DATA lv_length1 TYPE i.
+    DATA lv_length2 TYPE i.
+    DATA lv_value1 TYPE string.
+    DATA lv_value2 TYPE string.
+
+    lv_length1 = lines( it_data1 ).
+    lv_length2 = lines( it_data2 ).
+
+    DO .
+
+      IF lv_p1 <= lv_length1.
+        lv_value1 = it_data1[ lv_p1 ].
+      ELSE.
+        data(lv_end_v1) = abap_true.
+      ENDIF.
+
+      IF lv_p2 <= lv_length2.
+        lv_value2 = it_data2[ lv_p2 ].
+      ELSE.
+        data(lv_end_v2) = abap_true.
+      ENDIF.
+
+
+     if    lv_end_v2 = abap_false
+       and lv_end_v1 = abap_false.
+
+        IF  lv_value1 < lv_value2.
+            APPEND lv_value1 TO rt_result.
+            lv_p1 = lv_p1 + 1.
+
+        else.
+            APPEND lv_value2 TO rt_result.
+            lv_p2 = lv_p2 + 1.
+        ENDIF.
+
+      elseif lv_end_v2 = abap_true
+         and lv_end_v1 = abap_false.
+            APPEND lv_value1 TO rt_result.
+            lv_p1 = lv_p1 + 1.
+
+      elseif lv_end_v1 = abap_true
+         and lv_end_v2 = abap_false.
+            APPEND lv_value2 TO rt_result.
+            lv_p2 = lv_p2 + 1.
+
+      else.
+        EXIT.
+      ENDIF.
+
+    ENDDO.
+
+  ENDMETHOD.
+
+
+  METHOD split.
+    DATA lv_laenge TYPE i.
+    DATA lv_halbelaenge TYPE i.
+    DATA lv_count : TYPE i.
+    DATA lv_index TYPE i.
+    lv_laenge = lines( it_data ).
+    lv_halbelaenge =  lv_laenge / 2.
+
+*    et_data1 = et_data2 = it_data.
+
+    move-CORRESPONDING it_data to : et_data1,
+                                    et_data2.
+
+    delete et_data1 from lv_halbelaenge + 1.
+    delete et_data2 to lv_halbelaenge.
+
+*    lv_index = lv_laenge.
+*    DO lv_laenge - lv_halbelaenge  TIMES.    "löscht nacheinander die DS vom letzten bis zur Mitte von Tabelle 1
+*
+*      DELETE et_data1 INDEX lv_index.      ""das hätte man auch mit 'sy-index' lösen können-was könnte man eher als "Clean Code" bezeichnen?
+*      lv_index = lv_index - 1.
+*    ENDDO .                          "gibt die erste Hälfte der Tabelle aus
+*
+*    DO lv_halbelaenge TIMES.                "löscht die erste hälfte der DS aus der Tabelle  2
+*      DELETE et_data2 INDEX 1.              "immer der "erste DS", bis die Hälfte erreich ist...
+*    ENDDO.                           "gibt die zweite Hälfte der Tabelle aus
+
+  ENDMETHOD.
+ENDCLASS.
